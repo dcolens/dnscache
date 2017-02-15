@@ -18,6 +18,7 @@ describe('caching tests', function() {
         assert.ok(conf);
         assert.equal(conf.ttl, 300);
         assert.equal(conf.cachesize, 1000);
+        assert.equal(conf.cacheOnly.test('anything'), true);
     });
 
     it('should return a Cache Object with defaults without config', function() {
@@ -227,6 +228,22 @@ describe('caching tests', function() {
                 done();
             });
         }, 1200);
+    });
+
+    it('should not cache an item matching a cacheOnly', function(done) {
+        var CacheObject = new Mod_cache({
+            ttl: 300,
+            cachesize: 5,
+            cacheOnly: /1/
+        });
+
+        CacheObject.set(1, 1, function() {
+            assert.equal(CacheObject.count, 1);
+            CacheObject.set(2, 1, function() {
+                assert.equal(CacheObject.count, 1);
+                done();
+            });
+        });      
     });
 
 });
